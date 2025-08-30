@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "ipynb-translator": {
+      "command": "uv",
+      "args": ["run", "python", "mcp_server.py"],
+      "cwd": "/Users/daekeun/Github/ipynb-translator",
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "DEFAULT_TARGET_LANGUAGE": "ko",
+        "BEDROCK_MODEL_ID": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        "BATCH_SIZE": "5",
+        "ENABLE_POLISHING": "true",
+        "TRANSLATE_CODE_CELLS": "false",
+        "TEMPERATURE": "0.1",
+        "MAX_TOKENS": "2000"
+      }
+    }
+  }
+}
