@@ -50,16 +50,16 @@ def translate_notebook(args: TranslateNotebookArgs) -> str:
         if not notebook_path.exists():
             return f"Error: Notebook file not found: {args.notebook_path}"
         
-        success = translate_single_notebook(
+        success, actual_output_path = translate_single_notebook(
             notebook_path=notebook_path,
             target_language=args.target_language,
             model_id=args.model_id or Config.DEFAULT_MODEL_ID,
-            batch_size=args.batch_size
+            batch_size=args.batch_size,
+            output_path=args.output_path
         )
         
         if success:
-            output_path = args.output_path or f"{notebook_path.stem}_translated_{args.target_language}.ipynb"
-            return f"Successfully translated notebook to {output_path}"
+            return f"Successfully translated notebook to {actual_output_path}"
         else:
             return "Translation failed"
         
@@ -76,11 +76,12 @@ def translate_from_url(args: TranslateFromUrlArgs) -> str:
         temp_path = downloader.download_notebook(args.url)
         
         # Translate
-        success = translate_single_notebook(
+        success, actual_output_path = translate_single_notebook(
             notebook_path=Path(temp_path),
             target_language=args.target_language,
             model_id=Config.DEFAULT_MODEL_ID,
-            batch_size=20
+            batch_size=args.batch_size,
+            output_path=args.output_path
         )
         
         # Generate output path

@@ -28,7 +28,7 @@ def find_notebooks(folder_path: Path, recursive: bool = True) -> List[Path]:
 
 
 def translate_single_notebook(notebook_path: Path, target_language: str, model_id: str, 
-                            batch_size: int) -> bool:
+                            batch_size: int, output_path: str = None) -> tuple[bool, str]:
     """Translate a single notebook and return success status"""
     try:
         notebook_handler = NotebookHandler()
@@ -39,13 +39,13 @@ def translate_single_notebook(notebook_path: Path, target_language: str, model_i
         is_valid, validation_msg = notebook_handler.validate_notebook(notebook)
         if not is_valid:
             click.echo(f"   ⚠️ Skipping {notebook_path.name}: {validation_msg}")
-            return False
+            return False, ""
         
         # Check if there's content to translate
         info = notebook_handler.get_notebook_info(notebook)
         if info['translatable_markdown_cells'] == 0 and (not Config.TRANSLATE_CODE_CELLS or info['translatable_code_cells'] == 0):
             click.echo(f"   ⚠️ Skipping {notebook_path.name}: No translatable content")
-            return False
+            return False, ""
         
         # Extract cells
         markdown_cells = notebook_handler.extract_markdown_cells(notebook)
@@ -77,9 +77,12 @@ def translate_single_notebook(notebook_path: Path, target_language: str, model_i
             code_translations = []
         
         # Generate output path
-        output_file = Path(notebook_handler.generate_output_filename(
-            str(notebook_path), target_language
-        ))
+        if output_path:
+            output_file = Path(output_path)
+        else:
+            output_file = Path(notebook_handler.generate_output_filename(
+                str(notebook_path), target_language
+            ))
         
         # Update notebook with translations
         translated_notebook = notebook
@@ -92,11 +95,11 @@ def translate_single_notebook(notebook_path: Path, target_language: str, model_i
         notebook_handler.save_notebook(translated_notebook, str(output_file))
         
         click.echo(f"   ✅ {notebook_path.name} → {output_file}")
-        return True
+        return True, str(output_file)
         
     except Exception as e:
         click.echo(f"   ❌ Failed to translate {notebook_path.name}: {str(e)}")
-        return False
+        return False, ""
 
 
 @click.group()
@@ -319,7 +322,8 @@ def translate_folder(folder_path: Path, target_language: str,
         for i, notebook_path in enumerate(notebooks, 1):
             click.echo(f"\n📖 [{i}/{len(notebooks)}] Processing: {notebook_path.relative_to(folder_path)}")
             
-            if translate_single_notebook(notebook_path, target_language, model_id, batch_size):
+            success, _ = translate_single_notebook(notebook_path, target_language, model_id, batch_size)
+            if success:
                 success_count += 1
         
         # Summary
