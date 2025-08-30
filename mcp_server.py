@@ -50,12 +50,18 @@ def translate_notebook(args: TranslateNotebookArgs) -> str:
         if not notebook_path.exists():
             return f"Error: Notebook file not found: {args.notebook_path}"
         
+        # Generate default output path if not provided
+        output_path = args.output_path
+        if not output_path:
+            stem = notebook_path.stem
+            output_path = str(notebook_path.parent / f"{stem}_translated_{args.target_language}.ipynb")
+        
         success, actual_output_path = translate_single_notebook(
             notebook_path=notebook_path,
             target_language=args.target_language,
             model_id=args.model_id or Config.DEFAULT_MODEL_ID,
             batch_size=args.batch_size,
-            output_path=args.output_path
+            output_path=output_path
         )
         
         if success:
