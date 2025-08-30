@@ -179,77 +179,28 @@ def list_supported_models() -> dict[str, Any]:
     
     from ipynb_translator.config import Config
     
-    models = {
-        "amazon_nova": [
-            "amazon.nova-micro-v1:0",
-            "amazon.nova-lite-v1:0", 
-            "amazon.nova-pro-v1:0",
-            "amazon.nova-premier-v1:0"
-        ],
-        "anthropic_claude": [
-            "anthropic.claude-3-sonnet-20240229-v1:0",
-            "anthropic.claude-3-haiku-20240307-v1:0",
-            "anthropic.claude-3-5-sonnet-20240620-v1:0",
-            "anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "anthropic.claude-3-5-haiku-20241022-v1:0",
-            "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
-            "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-            "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-            "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-            "us.anthropic.claude-opus-4-20250514-v1:0",
-            "us.anthropic.claude-sonnet-4-20250514-v1:0",
-            "us.anthropic.claude-opus-4-1-20250805-v1:0"
-        ],
-        "meta_llama": [
-            "meta.llama3-8b-instruct-v1:0",
-            "meta.llama3-70b-instruct-v1:0",
-            "us.meta.llama3-1-8b-instruct-v1:0",
-            "us.meta.llama3-1-70b-instruct-v1:0",
-            "us.meta.llama3-2-1b-instruct-v1:0",
-            "us.meta.llama3-2-3b-instruct-v1:0",
-            "us.meta.llama3-2-11b-instruct-v1:0",
-            "us.meta.llama3-2-90b-instruct-v1:0",
-            "us.meta.llama3-3-70b-instruct-v1:0",
-            "us.meta.llama4-scout-17b-instruct-v1:0",
-            "us.meta.llama4-maverick-17b-instruct-v1:0"
-        ],
-        "deepseek": [
-            "deepseek.r1-v1:0",
-            "us.deepseek.r1-v1:0"
-        ],
-        "mistral": [
-            "mistral.mistral-7b-instruct-v0:2",
-            "mistral.mixtral-8x7b-instruct-v0:1",
-            "mistral.mistral-large-2402-v1:0",
-            "mistral.mistral-small-2402-v1:0",
-            "mistral.pixtral-large-2502-v1:0"
-        ],
-        "cohere": [
-            "cohere.command-r-v1:0",
-            "cohere.command-r-plus-v1:0"
-        ],
-        "ai21": [
-            "ai21.jamba-1-5-large-v1:0",
-            "ai21.jamba-1-5-mini-v1:0",
-            "ai21.jamba-instruct-v1:0"
-        ]
-    }
+    # Group models by provider
+    models = {}
+    for model in Config.SUPPORTED_MODELS:
+        if model.startswith("amazon.nova"):
+            models.setdefault("amazon_nova", []).append(model)
+        elif "anthropic" in model:
+            models.setdefault("anthropic_claude", []).append(model)
+        elif "meta.llama" in model or "us.meta.llama" in model:
+            models.setdefault("meta_llama", []).append(model)
+        elif "deepseek" in model:
+            models.setdefault("deepseek", []).append(model)
+        elif "mistral" in model:
+            models.setdefault("mistral", []).append(model)
+        elif "cohere" in model:
+            models.setdefault("cohere", []).append(model)
+        elif "ai21" in model:
+            models.setdefault("ai21", []).append(model)
     
     return {
         "supported_models": models,
         "total_models": len(Config.SUPPORTED_MODELS),
         "default_model": Config.DEFAULT_MODEL_ID
-    }
-
-@mcp.tool()
-def check_server_status() -> dict[str, Any]:
-    """Check if the MCP server is running properly."""
-    
-    return {
-        "status": "running",
-        "server": "ipynb-translator MCP Server",
-        "version": "1.0.0",
-        "tools_available": 6
     }
 
 if __name__ == "__main__":
