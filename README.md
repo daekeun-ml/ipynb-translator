@@ -21,7 +21,7 @@ A Jupyter Notebook translation tool that provides high-quality translations usin
 <td><img src="imgs/translated-ko.png" alt="Korean"/></td>
 </tr>
 <tr>
-<td align="center"><em>Original (English)t</em></td>
+<td align="center"><em>Original (English)</em></td>
 <td align="center"><em>Translated to Korean</em></td>
 </tr>
 </table>

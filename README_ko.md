@@ -21,7 +21,7 @@ AWS Bedrock을 활용하여 고품질 번역을 제공하는 Jupyter Notebook �
 <td><img src="imgs/translated-ko.png" alt="Korean"/></td>
 </tr>
 <tr>
-<td align="center"><em>Original (English)t</em></td>
+<td align="center"><em>Original (English)</em></td>
 <td align="center"><em>Translated to Korean</em></td>
 </tr>
 </table>
