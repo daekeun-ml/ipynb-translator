@@ -62,39 +62,36 @@ cp .env.example .env
 
 ```bash
 # 한국어로 번역
-uv run ipynb-translate translate notebook.ipynb
+uv run ipynb-translate translate samples/notebook.ipynb
 
 # 특정 언어로 번역
-uv run ipynb-translate translate notebook.ipynb -l ja
+uv run ipynb-translate translate samples/notebook.ipynb -l ja
 
 # 출력 파일 지정
-uv run ipynb-translate translate notebook.ipynb -o translated_notebook.ipynb
+uv run ipynb-translate translate samples/notebook.ipynb -o translated_notebook.ipynb
 ```
 
 ### URL에서 다운로드 후 번역
 
 ```bash
-# GitHub URL에서 노트북 다운로드 후 한국어로 번역
-uv run ipynb-translate translate-url https://github.com/awslabs/amazon-bedrock-agentcore-samples/blob/main/01-tutorials/01-AgentCore-runtime/02-hosting-MCP-server/hosting_mcp_server.ipynb
+# URL에서 노트북 다운로드 후 한국어로 번역
+uv run ipynb-translate translate-url https://[YOUR-URL]
 
 # 특정 언어로 번역하고 원본 파일 유지
-uv run ipynb-translate translate-url https://example.com/notebook.ipynb -l ja --keep-original
+uv run ipynb-translate translate-url https://[YOUR-URL] -l ja --keep-original
 
 # 출력 파일 지정
-uv run ipynb-translate translate-url https://example.com/notebook.ipynb -o my_translated_notebook.ipynb
+uv run ipynb-translate translate-url https://[YOUR-URL] -o my_translated_notebook.ipynb
 ```
 
 ### 디렉토리 경로 번역
 
 ```bash
 # 디렉토리 내 모든 노트북 번역
-uv run ipynb-translate translate-path ./notebooks
+uv run ipynb-translate translate-path ./samples
 
 # 특정 언어로 번역
-uv run ipynb-translate translate-path ./notebooks -l ja
-
-# 출력 디렉토리 지정
-uv run ipynb-translate translate-path ./notebooks -o ./translated_notebooks
+uv run ipynb-translate translate-path ./samples -l ja
 ```
 
 ### 고급 옵션
@@ -104,17 +101,17 @@ uv run ipynb-translate translate-path ./notebooks -o ./translated_notebooks
 uv run ipynb-translate translate samples/notebook.ipynb -m cohere.command-r-plus-v1:0
 
 # 배치 크기 조정
-uv run ipynb-translate translate notebook.ipynb -b 10
+uv run ipynb-translate translate samples/notebook.ipynb -b 10
 
 # 번역 미리보기
-uv run ipynb-translate translate notebook.ipynb --preview
+uv run ipynb-translate translate samples/notebook.ipynb --preview
 ```
 
 ### 유틸리티 명령어
 
 ```bash
 # 노트북 정보 확인
-uv run ipynb-translate info notebook.ipynb
+uv run ipynb-translate info samples/notebook.ipynb
 
 # 지원 언어 목록
 uv run ipynb-translate list-languages

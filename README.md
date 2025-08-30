@@ -62,36 +62,36 @@ cp .env.example .env
 
 ```bash
 # Translate to Korean
-uv run ipynb-translate translate notebook.ipynb
+uv run ipynb-translate translate samples/notebook.ipynb
 
 # Translate to specific language
-uv run ipynb-translate translate notebook.ipynb -l ja
+uv run ipynb-translate translate samples/notebook.ipynb -l ja
 
 # Specify output file
-uv run ipynb-translate translate notebook.ipynb -o translated_notebook.ipynb
+uv run ipynb-translate translate samples/notebook.ipynb -o translated_notebook.ipynb
 ```
 
 ### Download from URL and Translate
 
 ```bash
-# Download notebook from GitHub URL and translate to Korean
-uv run ipynb-translate translate-url https://github.com/awslabs/amazon-bedrock-agentcore-samples/blob/main/01-tutorials/01-AgentCore-runtime/02-hosting-MCP-server/hosting_mcp_server.ipynb
+# Download notebook from URL and translate to Korean
+uv run ipynb-translate translate-url https://[YOUR-URL]
 
 # Translate to specific language and keep original file
-uv run ipynb-translate translate-url https://example.com/notebook.ipynb -l ja --keep-original
+uv run ipynb-translate translate-url https://[YOUR-URL] -l ja --keep-original
 
 # Specify output file
-uv run ipynb-translate translate-url https://example.com/notebook.ipynb -o my_translated_notebook.ipynb
+uv run ipynb-translate translate-url https://[YOUR-URL] -o my_translated_notebook.ipynb
 ```
 
 ### Translate Directory Path
 
 ```bash
 # Translate all notebooks in a directory
-uv run ipynb-translate translate-folder ./notebooks
+uv run ipynb-translate translate-folder ./samples
 
 # Translate with specific language
-uv run ipynb-translate translate-folder ./notebooks -l ja
+uv run ipynb-translate translate-folder ./samples -l ja
 ```
 
 ### Advanced Options
@@ -101,17 +101,17 @@ uv run ipynb-translate translate-folder ./notebooks -l ja
 uv run ipynb-translate translate samples/notebook.ipynb -m cohere.command-r-plus-v1:0
 
 # Adjust batch size
-uv run ipynb-translate translate notebook.ipynb -b 10
+uv run ipynb-translate translate samples/notebook.ipynb -b 10
 
 # Translation preview
-uv run ipynb-translate translate notebook.ipynb --preview
+uv run ipynb-translate translate samples/notebook.ipynb --preview
 ```
 
 ### Utility Commands
 
 ```bash
 # Check notebook information
-uv run ipynb-translate info notebook.ipynb
+uv run ipynb-translate info samples/notebook.ipynb
 
 # List supported languages
 uv run ipynb-translate list-languages
