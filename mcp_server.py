@@ -10,7 +10,7 @@ from pydantic import Field
 from ipynb_translator.translation_engine import NotebookTranslationEngine
 from ipynb_translator.config import Config
 
-# MCP 서버 초기화
+# Initialize MCP server
 mcp = FastMCP("Jupyter Notebook Translator")
 
 @mcp.tool()
@@ -26,7 +26,7 @@ def translate_notebook(
     """Translate a Jupyter notebook to the specified language."""
     
     try:
-        # 설정 로드
+        # Load configuration
         config = Config()
         if model_id:
             config.bedrock_model_id = model_id
@@ -35,19 +35,19 @@ def translate_notebook(
         config.translate_code_cells = translate_code_cells
         config.enable_polishing = enable_polishing
         
-        # 번역기 초기화
+        # Initialize translator
         translator = NotebookTranslationEngine(config)
         
-        # 입력 파일 경로 처리
+        # Process input file path
         input_path = Path(notebook_path)
         if not input_path.exists():
             return {"error": f"File not found: {notebook_path}"}
         
-        # 출력 파일 경로 설정
+        # Set output file path
         if not output_path:
             output_path = str(input_path.parent / f"{input_path.stem}_{target_language}{input_path.suffix}")
         
-        # 번역 실행
+        # Execute translation
         result = translator.translate_notebook(
             input_path=str(input_path),
             output_path=output_path,
@@ -80,10 +80,10 @@ def translate_from_url(
     try:
         from src.downloader import download_notebook
         
-        # 노트북 다운로드
+        # Download notebook
         downloaded_path = download_notebook(url)
         
-        # 번역 실행
+        # Execute translation
         config = Config()
         config.translate_code_cells = translate_code_cells
         config.enable_polishing = enable_polishing
@@ -98,7 +98,7 @@ def translate_from_url(
             target_language=target_language
         )
         
-        # 원본 파일 정리
+        # Clean up original file
         if not keep_original:
             Path(downloaded_path).unlink()
         
@@ -128,11 +128,11 @@ def get_notebook_info(
         if not input_path.exists():
             return {"error": f"File not found: {notebook_path}"}
         
-        # 노트북 로드
+        # Load notebook
         with open(input_path, 'r', encoding='utf-8') as f:
             nb = nbformat.read(f, as_version=4)
         
-        # 셀 정보 수집
+        # Collect cell information
         total_cells = len(nb.cells)
         markdown_cells = sum(1 for cell in nb.cells if cell.cell_type == 'markdown')
         code_cells = sum(1 for cell in nb.cells if cell.cell_type == 'code')
@@ -172,6 +172,85 @@ def list_supported_languages() -> dict[str, Any]:
     }
     
     return {"supported_languages": languages}
+
+@mcp.tool()
+def list_supported_models() -> dict[str, Any]:
+    """List all supported Bedrock models."""
+    
+    from ipynb_translator.config import Config
+    
+    models = {
+        "amazon_nova": [
+            "amazon.nova-micro-v1:0",
+            "amazon.nova-lite-v1:0", 
+            "amazon.nova-pro-v1:0",
+            "amazon.nova-premier-v1:0"
+        ],
+        "anthropic_claude": [
+            "anthropic.claude-3-sonnet-20240229-v1:0",
+            "anthropic.claude-3-haiku-20240307-v1:0",
+            "anthropic.claude-3-5-sonnet-20240620-v1:0",
+            "anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "anthropic.claude-3-5-haiku-20241022-v1:0",
+            "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
+            "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+            "us.anthropic.claude-3-5-haiku-20241022-v1:0",
+            "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
+            "us.anthropic.claude-opus-4-20250514-v1:0",
+            "us.anthropic.claude-sonnet-4-20250514-v1:0",
+            "us.anthropic.claude-opus-4-1-20250805-v1:0"
+        ],
+        "meta_llama": [
+            "meta.llama3-8b-instruct-v1:0",
+            "meta.llama3-70b-instruct-v1:0",
+            "us.meta.llama3-1-8b-instruct-v1:0",
+            "us.meta.llama3-1-70b-instruct-v1:0",
+            "us.meta.llama3-2-1b-instruct-v1:0",
+            "us.meta.llama3-2-3b-instruct-v1:0",
+            "us.meta.llama3-2-11b-instruct-v1:0",
+            "us.meta.llama3-2-90b-instruct-v1:0",
+            "us.meta.llama3-3-70b-instruct-v1:0",
+            "us.meta.llama4-scout-17b-instruct-v1:0",
+            "us.meta.llama4-maverick-17b-instruct-v1:0"
+        ],
+        "deepseek": [
+            "deepseek.r1-v1:0",
+            "us.deepseek.r1-v1:0"
+        ],
+        "mistral": [
+            "mistral.mistral-7b-instruct-v0:2",
+            "mistral.mixtral-8x7b-instruct-v0:1",
+            "mistral.mistral-large-2402-v1:0",
+            "mistral.mistral-small-2402-v1:0",
+            "mistral.pixtral-large-2502-v1:0"
+        ],
+        "cohere": [
+            "cohere.command-r-v1:0",
+            "cohere.command-r-plus-v1:0"
+        ],
+        "ai21": [
+            "ai21.jamba-1-5-large-v1:0",
+            "ai21.jamba-1-5-mini-v1:0",
+            "ai21.jamba-instruct-v1:0"
+        ]
+    }
+    
+    return {
+        "supported_models": models,
+        "total_models": len(Config.SUPPORTED_MODELS),
+        "default_model": Config.DEFAULT_MODEL_ID
+    }
+
+@mcp.tool()
+def check_server_status() -> dict[str, Any]:
+    """Check if the MCP server is running properly."""
+    
+    return {
+        "status": "running",
+        "server": "ipynb-translator MCP Server",
+        "version": "1.0.0",
+        "tools_available": 6
+    }
 
 if __name__ == "__main__":
     mcp.run()

@@ -24,7 +24,11 @@ tools:
     description: Get notebook file information
   - name: list_supported_languages
     description: Return list of supported languages
+  - name: list_supported_models
+    description: Return list of supported Bedrock models
+  - name: check_server_status
+    description: Check MCP server status
 
 requirements:
-  - AWS credentials configured
+  - AWS credentials configured for translation functions
   - Internet connection for AWS Bedrock access
