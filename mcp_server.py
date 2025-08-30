@@ -58,7 +58,7 @@ def translate_notebook(args: TranslateNotebookArgs) -> str:
         )
         
         if success:
-            output_path = args.output_path or f"{notebook_path.stem}_{args.target_language}.ipynb"
+            output_path = args.output_path or f"{notebook_path.stem}_translated_{args.target_language}.ipynb"
             return f"Successfully translated notebook to {output_path}"
         else:
             return "Translation failed"
@@ -88,7 +88,7 @@ def translate_from_url(args: TranslateFromUrlArgs) -> str:
             output_path = args.output_path
         else:
             url_filename = Path(args.url).stem or "notebook"
-            output_path = f"{url_filename}_{args.target_language}.ipynb"
+            output_path = f"{url_filename}_translated_{args.target_language}.ipynb"
         
         # Clean up temp file if not keeping original
         if not args.keep_original:
