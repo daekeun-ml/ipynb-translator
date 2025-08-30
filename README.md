@@ -15,7 +15,7 @@ A Jupyter Notebook translation tool that provides high-quality translations usin
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/daekeun-ml/ipynb-translator.git
 cd ipynb-translator
 
 # If uv is not installed

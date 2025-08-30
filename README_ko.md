@@ -15,7 +15,7 @@ AWS Bedrock을 활용하여 고품질 번역을 제공하는 Jupyter Notebook �
 
 ```bash
 # 저장소 클론
-git clone <repository-url>
+git clone https://github.com/daekeun-ml/ipynb-translator.git
 cd ipynb-translator
 
 # uv가 설치되어 있지 않다면
