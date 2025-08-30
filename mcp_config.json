@@ -3,7 +3,7 @@
     "ipynb-translator": {
       "command": "uv",
       "args": ["run", "python", "mcp_server.py"],
-      "cwd": "/Users/daekeun/Github/ipynb-translator",
+      "cwd": "[YOUR-PATH]/ipynb-translator",
       "env": {
         "AWS_REGION": "us-east-1",
         "DEFAULT_TARGET_LANGUAGE": "ko",
