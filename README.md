@@ -11,6 +11,25 @@ A Jupyter Notebook translation tool that provides high-quality translations usin
 - 🌐 **Multi-language Support**: Support for 50+ languages
 - 🤖 **Multiple Models**: Support for various LLM models from AWS Bedrock
 
+## Examples
+
+### Translation
+
+<table>
+<tr>
+<td><img src="imgs/original-en.png" alt="English"/></td>
+<td><img src="imgs/translated-ko.png" alt="Korean"/></td>
+</tr>
+<tr>
+<td align="center"><em>Original (English)t</em></td>
+<td align="center"><em>Translated to Korean</em></td>
+</tr>
+</table>
+
+### Kiro MCP Examples
+
+![kiro1](imgs/mcp-kiro.png)
+
 ## Installation
 
 ```bash

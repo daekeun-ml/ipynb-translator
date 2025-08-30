@@ -11,6 +11,26 @@ AWS Bedrock을 활용하여 고품질 번역을 제공하는 Jupyter Notebook �
 - 🌐 **다국어 지원**: 50개 이상의 언어 지원
 - 🤖 **다양한 모델**: AWS Bedrock의 여러 LLM 모델 지원
 
+## 예시
+
+### 번역
+
+<table>
+<tr>
+<td><img src="imgs/original-en.png" alt="English"/></td>
+<td><img src="imgs/translated-ko.png" alt="Korean"/></td>
+</tr>
+<tr>
+<td align="center"><em>Original (English)t</em></td>
+<td align="center"><em>Translated to Korean</em></td>
+</tr>
+</table>
+
+### Kiro MCP 예시
+
+![kiro1](imgs/mcp-kiro.png)
+
+
 ## 설치
 
 ```bash
