@@ -217,12 +217,18 @@ Download notebook from URL and translate.
 #### 3. get_notebook_info
 Get notebook file information.
 
+**Parameters:**
+- `notebook_path` (required): Notebook file path
+
 #### 4. list_supported_languages
 Return list of supported languages.
 
+#### 5. list_supported_models
+Return list of supported models.
+
 ### MCP Client Configuration
 
-Add to configuration file for Claude Desktop or other MCP clients:
+Add to configuration file for MCP hosts:
 
 ```json
 {
@@ -232,7 +238,6 @@ Add to configuration file for Claude Desktop or other MCP clients:
       "args": ["run", "python", "mcp_server.py"],
       "cwd": "/path/to/ipynb-translator",
       "env": {
-        "PYTHONPATH": "/path/to/ipynb-translator",
         "AWS_REGION": "us-east-1",
         "DEFAULT_TARGET_LANGUAGE": "ko",
         "BEDROCK_MODEL_ID": "us.anthropic.claude-3-7-sonnet-20250219-v1:0",

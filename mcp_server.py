@@ -1,207 +1,134 @@
 #!/usr/bin/env python3
+"""FastMCP-based MCP server for Jupyter Notebook translation."""
 
+import os
 import asyncio
 from pathlib import Path
-from typing import Any
+from typing import Optional
 
 from fastmcp import FastMCP
-from pydantic import Field
+from pydantic import BaseModel
 
-from ipynb_translator.translation_engine import NotebookTranslationEngine
+from ipynb_translator.main import translate_single_notebook
+from ipynb_translator.url_downloader import NotebookURLDownloader
+from ipynb_translator.notebook_handler import NotebookHandler
 from ipynb_translator.config import Config
 
-# Initialize MCP server
+
+class TranslateNotebookArgs(BaseModel):
+    notebook_path: str
+    target_language: str = "ko"
+    output_path: Optional[str] = None
+    model_id: Optional[str] = None
+    batch_size: int = 20
+    translate_code_cells: bool = False
+    enable_polishing: bool = True
+
+
+class TranslateFromUrlArgs(BaseModel):
+    url: str
+    target_language: str = "ko"
+    output_path: Optional[str] = None
+    keep_original: bool = False
+    translate_code_cells: bool = False
+    enable_polishing: bool = True
+
+
+class NotebookInfoArgs(BaseModel):
+    notebook_path: str
+
+
+# Initialize FastMCP
 mcp = FastMCP("Jupyter Notebook Translator")
 
-@mcp.tool()
-def translate_notebook(
-    notebook_path: str = Field(description="Path to the Jupyter notebook file"),
-    target_language: str = Field(default="ko", description="Target language code (e.g., 'ko', 'ja', 'en')"),
-    output_path: str = Field(default="", description="Output file path (optional)"),
-    model_id: str = Field(default="", description="Bedrock model ID (optional)"),
-    batch_size: int = Field(default=20, description="Batch size for translation"),
-    translate_code_cells: bool = Field(default=False, description="Whether to translate code cell comments"),
-    enable_polishing: bool = Field(default=True, description="Enable natural translation polishing")
-) -> dict[str, Any]:
-    """Translate a Jupyter notebook to the specified language."""
-    
-    try:
-        # Load configuration
-        config = Config()
-        if model_id:
-            config.bedrock_model_id = model_id
-        if batch_size != 20:
-            config.batch_size = batch_size
-        config.translate_code_cells = translate_code_cells
-        config.enable_polishing = enable_polishing
-        
-        # Initialize translator
-        translator = NotebookTranslationEngine(config)
-        
-        # Process input file path
-        input_path = Path(notebook_path)
-        if not input_path.exists():
-            return {"error": f"File not found: {notebook_path}"}
-        
-        # Set output file path
-        if not output_path:
-            output_path = str(input_path.parent / f"{input_path.stem}_{target_language}{input_path.suffix}")
-        
-        # Execute translation
-        result = translator.translate_notebook(
-            input_path=str(input_path),
-            output_path=output_path,
-            target_language=target_language
-        )
-        
-        return {
-            "success": True,
-            "input_file": str(input_path),
-            "output_file": output_path,
-            "target_language": target_language,
-            "translated_cells": result.get("translated_cells", 0),
-            "total_cells": result.get("total_cells", 0)
-        }
-        
-    except Exception as e:
-        return {"error": str(e)}
 
 @mcp.tool()
-def translate_from_url(
-    url: str = Field(description="URL to the Jupyter notebook"),
-    target_language: str = Field(default="ko", description="Target language code"),
-    output_path: str = Field(default="", description="Output file path (optional)"),
-    keep_original: bool = Field(default=False, description="Keep the original downloaded file"),
-    translate_code_cells: bool = Field(default=False, description="Whether to translate code cell comments"),
-    enable_polishing: bool = Field(default=True, description="Enable natural translation polishing")
-) -> dict[str, Any]:
-    """Download and translate a Jupyter notebook from URL."""
-    
+def translate_notebook(args: TranslateNotebookArgs) -> str:
+    """Translate Jupyter notebook to specified language."""
     try:
-        from src.downloader import download_notebook
+        notebook_path = Path(args.notebook_path)
+        if not notebook_path.exists():
+            return f"Error: Notebook file not found: {args.notebook_path}"
         
+        success = translate_single_notebook(
+            notebook_path=notebook_path,
+            target_language=args.target_language,
+            model_id=args.model_id or Config.DEFAULT_MODEL_ID,
+            batch_size=args.batch_size
+        )
+        
+        if success:
+            output_path = args.output_path or f"{notebook_path.stem}_{args.target_language}.ipynb"
+            return f"Successfully translated notebook to {output_path}"
+        else:
+            return "Translation failed"
+        
+    except Exception as e:
+        return f"Error translating notebook: {str(e)}"
+
+
+@mcp.tool()
+def translate_from_url(args: TranslateFromUrlArgs) -> str:
+    """Download notebook from URL and translate."""
+    try:
         # Download notebook
-        downloaded_path = download_notebook(url)
+        downloader = NotebookURLDownloader()
+        temp_path = downloader.download_notebook(args.url)
         
-        # Execute translation
-        config = Config()
-        config.translate_code_cells = translate_code_cells
-        config.enable_polishing = enable_polishing
-        translator = NotebookTranslationEngine(config)
-        
-        if not output_path:
-            output_path = f"translated_{Path(downloaded_path).name}"
-        
-        result = translator.translate_notebook(
-            input_path=downloaded_path,
-            output_path=output_path,
-            target_language=target_language
+        # Translate
+        success = translate_single_notebook(
+            notebook_path=Path(temp_path),
+            target_language=args.target_language,
+            model_id=Config.DEFAULT_MODEL_ID,
+            batch_size=20
         )
         
-        # Clean up original file
-        if not keep_original:
-            Path(downloaded_path).unlink()
+        # Generate output path
+        if args.output_path:
+            output_path = args.output_path
+        else:
+            url_filename = Path(args.url).stem or "notebook"
+            output_path = f"{url_filename}_{args.target_language}.ipynb"
         
-        return {
-            "success": True,
-            "source_url": url,
-            "output_file": output_path,
-            "target_language": target_language,
-            "translated_cells": result.get("translated_cells", 0),
-            "total_cells": result.get("total_cells", 0),
-            "original_kept": keep_original
-        }
+        # Clean up temp file if not keeping original
+        if not args.keep_original:
+            os.unlink(temp_path)
+        
+        if success:
+            return f"Successfully downloaded and translated notebook to {output_path}"
+        else:
+            return "Translation failed"
         
     except Exception as e:
-        return {"error": str(e)}
+        return f"Error downloading/translating notebook: {str(e)}"
+
 
 @mcp.tool()
-def get_notebook_info(
-    notebook_path: str = Field(description="Path to the Jupyter notebook file")
-) -> dict[str, Any]:
-    """Get information about a Jupyter notebook."""
-    
+def get_notebook_info(args: NotebookInfoArgs) -> str:
+    """Get notebook file information."""
     try:
-        import nbformat
-        
-        input_path = Path(notebook_path)
-        if not input_path.exists():
-            return {"error": f"File not found: {notebook_path}"}
-        
-        # Load notebook
-        with open(input_path, 'r', encoding='utf-8') as f:
-            nb = nbformat.read(f, as_version=4)
-        
-        # Collect cell information
-        total_cells = len(nb.cells)
-        markdown_cells = sum(1 for cell in nb.cells if cell.cell_type == 'markdown')
-        code_cells = sum(1 for cell in nb.cells if cell.cell_type == 'code')
-        
-        return {
-            "file_path": str(input_path),
-            "total_cells": total_cells,
-            "markdown_cells": markdown_cells,
-            "code_cells": code_cells,
-            "notebook_format": nb.nbformat,
-            "kernel_info": nb.metadata.get('kernelspec', {}).get('display_name', 'Unknown')
-        }
-        
+        handler = NotebookHandler()
+        notebook = handler.load_notebook(args.notebook_path)
+        info = handler.get_notebook_info(notebook)
+        return f"Notebook info: {info}"
     except Exception as e:
-        return {"error": str(e)}
+        return f"Error getting notebook info: {str(e)}"
+
 
 @mcp.tool()
-def list_supported_languages() -> dict[str, Any]:
-    """List all supported languages for translation."""
-    
-    languages = {
-        "ko": "Korean",
-        "ja": "Japanese", 
-        "zh-CN": "Chinese (Simplified)",
-        "zh-TW": "Chinese (Traditional)",
-        "en": "English",
-        "fr": "French",
-        "de": "German",
-        "es": "Spanish",
-        "it": "Italian",
-        "pt": "Portuguese",
-        "ru": "Russian",
-        "ar": "Arabic",
-        "hi": "Hindi",
-        "th": "Thai",
-        "vi": "Vietnamese"
-    }
-    
-    return {"supported_languages": languages}
+def list_supported_languages() -> str:
+    """Return list of supported languages."""
+    languages = []
+    for code, name in Config.LANGUAGE_MAP.items():
+        languages.append(f"{code}: {name}")
+    return "\n".join(languages)
+
 
 @mcp.tool()
-def list_supported_models() -> dict[str, Any]:
-    """List all supported Bedrock models."""
-    
-    from ipynb_translator.config import Config
-    
-    # Group models by provider
-    models = {}
-    for model in Config.SUPPORTED_MODELS:
-        if model.startswith("amazon.nova"):
-            models.setdefault("amazon_nova", []).append(model)
-        elif "anthropic" in model:
-            models.setdefault("anthropic_claude", []).append(model)
-        elif "meta.llama" in model or "us.meta.llama" in model:
-            models.setdefault("meta_llama", []).append(model)
-        elif "deepseek" in model:
-            models.setdefault("deepseek", []).append(model)
-        elif "mistral" in model:
-            models.setdefault("mistral", []).append(model)
-        elif "cohere" in model:
-            models.setdefault("cohere", []).append(model)
-        elif "ai21" in model:
-            models.setdefault("ai21", []).append(model)
-    
-    return {
-        "supported_models": models,
-        "total_models": len(Config.SUPPORTED_MODELS),
-        "default_model": Config.DEFAULT_MODEL_ID
-    }
+def list_supported_models() -> str:
+    """Return list of supported models."""
+    return "\n".join(Config.SUPPORTED_MODELS)
+
 
 if __name__ == "__main__":
     mcp.run()

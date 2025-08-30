@@ -178,10 +178,20 @@ BATCH_SIZE=5
 DEBUG=false
 ```
 
-## MCP 제공 도구
-FastMCP 서버는 다음 도구를 제공합니다:
+## MCP 서버 사용법
 
-### 1. translate_notebook
+FastMCP 기반 MCP 서버가 Jupyter Notebook 번역 기능을 제공합니다.
+
+### MCP 서버 실행
+
+```bash
+# MCP 서버 실행
+uv run python mcp_server.py
+```
+
+### MCP 도구
+
+#### 1. translate_notebook
 Jupyter 노트북을 지정된 언어로 번역합니다.
 
 **매개변수:**
@@ -193,7 +203,7 @@ Jupyter 노트북을 지정된 언어로 번역합니다.
 - `translate_code_cells` (기본값: false): 코드 셀 주석 번역 여부
 - `enable_polishing` (기본값: true): 자연스러운 번역 활성화
 
-### 2. translate_from_url
+#### 2. translate_from_url
 URL에서 노트북을 다운로드하고 번역합니다.
 
 **매개변수:**
@@ -204,13 +214,21 @@ URL에서 노트북을 다운로드하고 번역합니다.
 - `translate_code_cells` (기본값: false): 코드 셀 주석 번역 여부
 - `enable_polishing` (기본값: true): 자연스러운 번역 활성화
 
-### 3. get_notebook_info
+#### 3. get_notebook_info
 노트북 파일 정보를 조회합니다.
 
-### 4. list_supported_languages
+**매개변수:**
+- `notebook_path` (필수): 노트북 파일 경로
+
+#### 4. list_supported_languages
 지원되는 언어 목록을 반환합니다.
 
-## MCP 설정 예시
+#### 5. list_supported_models
+지원되는 모델 목록을 반환합니다.
+
+### MCP 클라이언트 설정
+
+MCP 호스트의 설정 파일에 추가:
 
 ```json
 {
@@ -233,6 +251,20 @@ URL에서 노트북을 다운로드하고 번역합니다.
   }
 }
 ```
+
+### MCP 환경 변수
+
+`mcp_config.json`의 `env` 섹션에서 다음 환경 변수를 설정할 수 있습니다:
+
+- `AWS_REGION`: AWS 리전 (기본값: us-east-1)
+- `AWS_PROFILE`: AWS 프로필 이름 (선택사항)
+- `DEFAULT_TARGET_LANGUAGE`: 기본 번역 언어 (기본값: ko)
+- `BEDROCK_MODEL_ID`: 사용할 Bedrock 모델 ID
+- `BATCH_SIZE`: 배치 처리 크기 (기본값: 5)
+- `ENABLE_POLISHING`: 자연스러운 번역 활성화 (true/false)
+- `TRANSLATE_CODE_CELLS`: 코드 셀 주석 번역 (true/false)
+- `TEMPERATURE`: 모델 온도 (0.0-1.0)
+- `MAX_TOKENS`: 최대 토큰 수
 
 ## 제한사항
 
