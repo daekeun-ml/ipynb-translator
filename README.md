@@ -21,7 +21,7 @@ A Jupyter Notebook translation tool that provides high-quality translations usin
 <td><img src="imgs/translated-ko.png" alt="Korean"/></td>
 </tr>
 <tr>
-<td align="center"><em>Original (English)</em></td>
+<td align="center"><em>Original (English)t</em></td>
 <td align="center"><em>Translated to Korean</em></td>
 </tr>
 </table>
@@ -121,42 +121,6 @@ uv run ipynb-translate list-models
 
 # Check AWS credentials
 uv run ipynb-translate check-credentials
-```
-
-## Translation Example
-
-### Original Markdown Cell
-```markdown
-# Machine Learning Tutorial
-
-This notebook demonstrates how to build a simple neural network.
-
-```python
-def train_model(data):
-    """Train a machine learning model"""
-    # Initialize the model
-    model = create_model()
-    return model
-```
-
-Let's start with data preprocessing.
-```
-
-### Translated Markdown Cell (Korean)
-```markdown
-# 머신 러닝 튜토리얼
-
-이 노트북은 간단한 신경망을 구축하는 방법을 보여줍니다.
-
-```python
-def train_model(data):
-    """Train a machine learning model"""
-    # 모델을 초기화합니다
-    model = create_model()
-    return model
-```
-
-데이터 전처리부터 시작해보겠습니다.
 ```
 
 ## Supported Languages
