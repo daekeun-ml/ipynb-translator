@@ -26,9 +26,18 @@ A Jupyter Notebook translation tool that provides high-quality translations usin
 </tr>
 </table>
 
-### Kiro MCP Examples
+### MCP Examples
 
-![kiro1](imgs/mcp-kiro.png)
+<table>
+<tr>
+<td><img src="imgs/mcp-kiro.png" alt="Kiro MCP"/></td>
+<td><img src="imgs/mcp-amazonq.png" alt="Amazon Q MCP"/></td>
+</tr>
+<tr>
+<td align="center"><em>Kiro MCP</em></td>
+<td align="center"><em>Amazon Q MCP</em></td>
+</tr>
+</table>
 
 ## Installation
 
